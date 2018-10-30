@@ -23,7 +23,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         // Show statistics such as fps and timing information
         sceneView.showsStatistics = true
         //特徴点を検出している様子が観れる
-        sceneView.debugOptions = [ARSCNDebugOptions.showFeaturePoints]
+        //sceneView.debugOptions = [ARSCNDebugOptions.showFeaturePoints]
         let scene = SCNScene()
     }
     
@@ -54,19 +54,19 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         sceneView.session.pause()
     }
     
-    //tapaction
+    //tap時のactionを追加
     @IBAction func tapp(_ sender: UITapGestureRecognizer) {
         let tapPoint = sender.location(in: sceneView)
         //.existingPlaneUsingExtent()から.featurePoint(特徴点検出)に変えた.
-        let results = sceneView.hitTest(tapPoint, types: .featurePoint)
-        let hitpoint = results.first
+        let results = sceneView.hitTest(tapPoint, types: .existingPlaneUsingExtent)
+
+        if let hitpoint = results.first{
+        //取得した座標を SCNNode の position に再設定し、ノードを移動させる(現実世界の座標に変換)
+        let point = SCNVector3.init(hitpoint.worldTransform.columns.3.x,
+                                    hitpoint.worldTransform.columns.3.y,
+                                    hitpoint.worldTransform.columns.3.z)
+        }
         
-        //取得した座標を SCNNode の position に再設定し、ノードを移動させるelse {
-        
-        let point = SCNVector3.init(hitpoint!.worldTransform.columns.3.x,
-                                    hitpoint!.worldTransform.columns.3.y,
-                                    hitpoint!.worldTransform.columns.3.z)
-        print("\(tapPoint)")
         
     }
   
@@ -74,7 +74,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     
     
     
-   /* func readPeachNode(resource:String, node_name:String) -> SCNNode
+    func readPeachNode(resource:String, node_name:String) -> SCNNode
     {
         //バンドルのパスを取得
         guard let url = Bundle.main.url(forResource: resource, withExtension: "dae") else {
@@ -91,8 +91,9 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         //読み込んだシーンから必要なノードを取り出す
         return peach_scene.rootNode.childNode(withName: node_name, recursively: true)!
     }
- */
+ 
     // Override to create and configure nodes for anchors added to the view's session.
+   
     func renderer(_ renderer: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
         let node = SCNNode()
      
@@ -118,14 +119,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             //回転の変更
             node.eulerAngles.x = 0
         }
-      /*
-         //読み込んだ時にファイル名をアプリに表示
-         DispatchQueue.main.async {
-            let imageName = .name ?? ""
-            self.statusViewController.cancelAllScheduledMessages()
-            self.statusViewController.showMessage("Detected image “\(imageName)”")
-        }
- */
+      
        
          return node
     }
